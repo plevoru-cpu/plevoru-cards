@@ -1,0 +1,35 @@
+name: IG Poster
+
+on:
+  schedule:
+    # KST 11:00/15:00/19:00/22:00  =  UTC 02:00/06:00/10:00/13:00
+    - cron: '0 2,6,10,13 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ig-poster
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run poster
+        env:
+          MAKE_WEBHOOK: ${{ secrets.MAKE_WEBHOOK }}
+        run: python3 scripts/post.py
+      - name: Commit queue update
+        run: |
+          if git diff --quiet -- queue.json; then
+            echo "no queue change"
+          else
+            git config user.name "plevoru-bot"
+            git config user.email "actions@users.noreply.github.com"
+            git add queue.json
+            git commit -m "poster: mark posted"
+            git push
+          fi
