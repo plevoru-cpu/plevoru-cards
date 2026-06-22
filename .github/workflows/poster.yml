@@ -5,6 +5,9 @@ on:
     # KST 11:00/15:00/19:00/22:00  =  UTC 02:00/06:00/10:00/13:00
     - cron: '0 2,6,10,13 * * *'
   workflow_dispatch: {}
+  push:
+    branches: [ main ]
+    paths: [ '.github/workflows/poster.yml' ]
 
 permissions:
   contents: write
